@@ -65,8 +65,9 @@ def read_data(filename,filename_v):
     i=0
     with open(filename_v, 'r', encoding="utf-8") as fv:
         for l in fv:
-            data = tf.compat.as_str(l.strip()).split(',')
-            diction[int(data[0])]=[data[1],data[2],int(data[3])]
+            if i>0:
+                data = tf.compat.as_str(l.strip()).split(',')
+                diction[int(data[0])]=[data[1],data[2],int(data[3])]
             i += 1
 #            print(i, diction,  data)
 #            if i>5:
@@ -75,12 +76,13 @@ def read_data(filename,filename_v):
     with open(filename, 'r', encoding="utf-8") as f:
 
         for line in f:
-            texts.append( line[line.find('||') + 2:])
-            id = int(line[:line.find('||')])
+            if i>0:
+                texts.append( line[line.find('||') + 2:])
+                id = int(line[:line.find('||')])
+                labels.append(diction[id][2])
+                labels_index[str(diction[id][2])]=diction[id][2]
+                #print(len(tf.compat.as_str(line.strip()).split()), diction[int(line[:line.find('||')])][2])
             i+=1
-            labels.append(diction[id][2])
-            labels_index[str(diction[id][2])]=diction[id][2]
-            #print(len(tf.compat.as_str(line.strip()).split()), diction[int(line[:line.find('||')])][2])
             if i>=NUM_ROWS_FROM_TEXT :
                 break
     return texts,labels,labels_index
