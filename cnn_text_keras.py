@@ -9,7 +9,7 @@ from tensorflow.contrib.keras.python.keras.preprocessing.text import Tokenizer
 from tensorflow.contrib.keras.python.keras.preprocessing.sequence import pad_sequences
 from tensorflow.contrib.keras.python.keras.layers import Embedding, Conv1D, MaxPooling1D, Flatten, Dense
 d_now=datetime.datetime.now()
-TEXT_DATA_DIR = ".\\data"
+TEXT_DATA_DIR = "./data"
 GLOVE_DIR = "./glove.6B"
 SAVE_DIR= "./Save"+ str(int(d_now.timestamp()))
 if not os.path.exists(SAVE_DIR): os.mkdir(SAVE_DIR)
@@ -17,11 +17,11 @@ if not os.path.exists(SAVE_DIR): os.mkdir(SAVE_DIR)
 MAX_NB_WORDS=180000 #словарь
 EMBEDDING_DIM=100
 VALIDATION_SPLIT=0.05
-NUM_ROWS_FROM_TEXT= 550
+NUM_ROWS_FROM_TEXT= 3500
 NUM_ROWS_SAVE_TO_TRAIN=100
 NUM_ROWS_SAVE_TO_VAL=int(NUM_ROWS_SAVE_TO_TRAIN*VALIDATION_SPLIT)
-filename="..\\training_text"
-filename_v="..\\training_variants"
+filename="./training_text"
+filename_v="./training_variants"
 
 
 texts = []  # list of text samples
