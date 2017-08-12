@@ -20,6 +20,7 @@ VALIDATION_SPLIT=0.05
 NUM_ROWS_FROM_TEXT= 3500
 NUM_ROWS_SAVE_TO_TRAIN=100
 NUM_ROWS_SAVE_TO_VAL=int(NUM_ROWS_SAVE_TO_TRAIN*VALIDATION_SPLIT)
+NUM_EPOCHS=7
 filename="./training_text"
 filename_v="./training_variants"
 
@@ -185,21 +186,23 @@ model.compile(loss='categorical_crossentropy',
               metrics=['acc'])
 
 
-i=0
-for j in range(NUM_ROWS_SAVE_TO_TRAIN-NUM_ROWS_SAVE_TO_VAL, lendata, NUM_ROWS_SAVE_TO_TRAIN-NUM_ROWS_SAVE_TO_VAL ):
-    x_train = np.load(os.path.join(SAVE_DIR, 'data_'+str(i)+'_'+str(j)+'.npy'))
-    y_train = np.load(os.path.join(SAVE_DIR, 'labels_' + str(i) + '_' + str(j) + '.npy'))
-    x_val = np.load(os.path.join(SAVE_DIR, 'data_'+str(j+1)+'_'+str(j+NUM_ROWS_SAVE_TO_VAL)+'.npy'))
-    y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(j+1) + '_' + str(j+NUM_ROWS_SAVE_TO_VAL) + '.npy'))
+for epoch in range(NUM_EPOCHS):
+    i=0
+    for j in range(NUM_ROWS_SAVE_TO_TRAIN-NUM_ROWS_SAVE_TO_VAL, lendata, NUM_ROWS_SAVE_TO_TRAIN-NUM_ROWS_SAVE_TO_VAL ):
+        x_train = np.load(os.path.join(SAVE_DIR, 'data_'+str(i)+'_'+str(j)+'.npy'))
+        y_train = np.load(os.path.join(SAVE_DIR, 'labels_' + str(i) + '_' + str(j) + '.npy'))
+        x_val = np.load(os.path.join(SAVE_DIR, 'data_'+str(j+1)+'_'+str(j+NUM_ROWS_SAVE_TO_VAL)+'.npy'))
+        y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(j+1) + '_' + str(j+NUM_ROWS_SAVE_TO_VAL) + '.npy'))
+        model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=1, batch_size=5)
+        model.save('CNN_woVEC')
+        i=j+1
+    x_train = np.load(os.path.join(SAVE_DIR, 'data_'+str(i)+'_'+str(lendata)+'.npy'))
+    y_train = np.load(os.path.join(SAVE_DIR, 'labels_' + str(i) + '_' + str(lendata) + '.npy'))
+    x_val = np.load(os.path.join(SAVE_DIR, 'data_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
+    y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
     model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=1, batch_size=5)
     model.save('CNN_woVEC')
-    i=j+1
-x_train = np.load(os.path.join(SAVE_DIR, 'data_'+str(i)+'_'+str(lendata)+'.npy'))
-y_train = np.load(os.path.join(SAVE_DIR, 'labels_' + str(i) + '_' + str(lendata) + '.npy'))
-x_val = np.load(os.path.join(SAVE_DIR, 'data_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
-y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
-model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=1, batch_size=5)
-model.save('CNN_woVEC')
+    print (epoch)
 
 
 
