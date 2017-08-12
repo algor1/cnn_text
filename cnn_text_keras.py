@@ -202,7 +202,7 @@ for epoch in range(NUM_EPOCHS):
     y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
     model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=1, batch_size=5)
     model.save('CNN_woVEC')
-    print (epoch)
+    print ("-------------------------- E-P-O-C-H--"+epoch+"----------------------------------------)
 
 
 
