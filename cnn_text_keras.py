@@ -15,12 +15,12 @@ SAVE_DIR= "./Save"+ str(int(d_now.timestamp()))
 if not os.path.exists(SAVE_DIR): os.mkdir(SAVE_DIR)
 
 MAX_NB_WORDS=180000 #словарь
-EMBEDDING_DIM=100
+EMBEDDING_DIM=300
 VALIDATION_SPLIT=0.05
-NUM_ROWS_FROM_TEXT= 3500
+NUM_ROWS_FROM_TEXT=5000
 NUM_ROWS_SAVE_TO_TRAIN=100
 NUM_ROWS_SAVE_TO_VAL=int(NUM_ROWS_SAVE_TO_TRAIN*VALIDATION_SPLIT)
-NUM_EPOCHS=7
+NUM_EPOCHS=1
 filename="./training_text"
 filename_v="./training_variants"
 
@@ -60,7 +60,6 @@ def read_data(filename,filename_v):
     labels_index = {}  # dictionary mapping label name to numeric id
     labels = []  # list of label ids
     labels_index['0'] = 0
-    """Extract the first file enclosed in a zip file as a list of words"""
     diction=dict()
     ret=dict()
     i=0
@@ -122,7 +121,7 @@ nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
 
 
 embeddings_index = {}
-f = open(os.path.join(GLOVE_DIR, 'glove.6B.100d.txt'), encoding="utf-8")
+f = open(os.path.join(GLOVE_DIR, 'glove.6B.300d.txt'), encoding="utf-8")
 for line in f:
     values = line.split()
     word = values[0]
@@ -185,6 +184,8 @@ model.compile(loss='categorical_crossentropy',
               optimizer='rmsprop',
               metrics=['acc'])
 
+embedding_matrix=None
+embeddings_index=None
 
 for epoch in range(NUM_EPOCHS):
     i=0
@@ -194,7 +195,7 @@ for epoch in range(NUM_EPOCHS):
         x_val = np.load(os.path.join(SAVE_DIR, 'data_'+str(j+1)+'_'+str(j+NUM_ROWS_SAVE_TO_VAL)+'.npy'))
         y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(j+1) + '_' + str(j+NUM_ROWS_SAVE_TO_VAL) + '.npy'))
         model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=1, batch_size=5)
-        model.save(os.path.join(SAVE_DIR, 'CNN_woVEC.model'))
+        model.save(os.path.join(SAVE_DIR,'CNN_woVEC'))
         i=j+1
         print("---------Epoch ",epoch,"   ------batch  ",i)
     x_train = np.load(os.path.join(SAVE_DIR, 'data_'+str(i)+'_'+str(lendata)+'.npy'))
@@ -202,8 +203,16 @@ for epoch in range(NUM_EPOCHS):
     x_val = np.load(os.path.join(SAVE_DIR, 'data_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
     y_val = np.load(os.path.join(SAVE_DIR, 'labels_' + str(lendata-1) + '_' + str(lendata) + '.npy'))
     model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=1, batch_size=5)
-    model.save(os.path.join(SAVE_DIR, 'CNN_woVEC.model'))
+    model.save(os.path.join(SAVE_DIR,'CNN_woVEC'))
     print ("=======================--E-P-O-C-H--",epoch,"---========================================")
+
+
+with open (os.path.join(SAVE_DIR, 'info.log'), 'a') as f:
+    f.write (str(datetime.datetime.now()))
+    f.write("Epoch          "+str( epoch)+'\n')
+    f.write('datacount      '+str(lendata)+'\n')
+    f.write('dict           '+str(MAX_NB_WORDS)+'\n')
+    f.write('EMBEDDING_DIM  '+str(EMBEDDING_DIM)+'\n')
 
 
 
