@@ -24,7 +24,7 @@ NUM_EPOCHS=1
 filename="./test_text"
 filename_v="./test_variants"
 
-tf.flags.DEFINE_string("loaddir", "Save1502701313", "Load data")
+tf.flags.DEFINE_string("loaddir", "Save1502722965", "Load data")
 
 
 FLAGS = tf.flags.FLAGS

@@ -23,11 +23,11 @@ VALIDATION_SPLIT=0.05
 NUM_ROWS_FROM_TEXT=5000
 NUM_ROWS_SAVE_TO_TRAIN=1000
 NUM_ROWS_SAVE_TO_VAL=int(NUM_ROWS_SAVE_TO_TRAIN*VALIDATION_SPLIT)
-NUM_EPOCHS=25
+NUM_EPOCHS=3
 filename="./training_text"
 filename_v="./training_variants"
 
-tf.flags.DEFINE_string("loaddir", "Save1502895679", "Load data")
+tf.flags.DEFINE_string("loaddir", "Save1503500893", "Load data")
 
 
 FLAGS = tf.flags.FLAGS

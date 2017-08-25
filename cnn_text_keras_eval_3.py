@@ -1,4 +1,5 @@
 import datetime
+import re
 import os,sys
 import numpy as np
 import tensorflow as tf
@@ -25,7 +26,7 @@ NUM_EPOCHS=1
 filename="./test_text"
 filename_v="./test_variants"
 
-tf.flags.DEFINE_string("loaddir", "Save1503500893", "Load data")
+tf.flags.DEFINE_string("loaddir", "Save1503665420", "Load data")
 
 
 FLAGS = tf.flags.FLAGS
@@ -36,11 +37,27 @@ for attr, value in sorted(FLAGS.__flags.items()):
 print("")
 
 word_index = np.load (os.path.join(FLAGS.loaddir, 'word_index.npy'))
+word_index_gen = np.load (os.path.join(FLAGS.loaddir, 'word_index_gen.npy'))
 model= load_model(os.path.join(FLAGS.loaddir, 'CNN_woVEC'))
-model_shape1=model.input_shape[1]
+model_shape1=model.input_shape[0][1]
 i = 0
+print (model.summary())
 
-def predict(_t_w, _id,_word_index,_model,_sf,_model_shape1):
+diction=dict()
+
+with open(filename_v, 'r', encoding="utf-8") as fv:
+    for l in fv:
+        if i>0:
+            data = tf.compat.as_str(l.strip()).split(',')
+
+            diction[int(data[0])]=\
+                [word_index_gen.item().get(re.sub('[^a-z^0-9]', '', data[1].lower()), 0),
+                 word_index_gen.item().get(re.sub('[^a-z^0-9]', '', data[2].lower()), 0)]
+        i += 1
+
+
+
+def predict(_t_w, _id,_word_index,_model,_model_shape1):
     sec = []
     sequences = []
     for w in _t_w:
@@ -48,8 +65,9 @@ def predict(_t_w, _id,_word_index,_model,_sf,_model_shape1):
     sequences.append(sec)
 
     data = pad_sequences([sec], maxlen=_model_shape1)
+    data_gen = pad_sequences([diction[id]],maxlen=2)
 
-    prediction = _model.predict(data, batch_size=1)
+    prediction = _model.predict([data,data_gen], batch_size=1)
 
 
     return prediction[0]
@@ -58,7 +76,7 @@ def predict(_t_w, _id,_word_index,_model,_sf,_model_shape1):
 
 
 
-
+i=0
 with open(filename, 'r', encoding="utf-8") as f:
     with open(os.path.join(SAVE_DIR, 'submissionFile'), 'a') as sf:
         with open(os.path.join(SAVE_DIR, 'submissionFile_average'), 'a') as sfa:
@@ -78,23 +96,31 @@ with open(filename, 'r', encoding="utf-8") as f:
                         for text_i in range(0, len(t_w), MAX_NB_WORDS_IN_TEXT):
                             if text_i + MAX_NB_WORDS_IN_TEXT - 1 < len(t_w):
                                 t_w_splited=t_w[text_i:text_i + MAX_NB_WORDS_IN_TEXT - 1]
-                                predict_list.append(predict(t_w_splited, id, word_index, model, sf,model_shape1))
+                                predict_list.append(predict(t_w_splited, id, word_index, model, model_shape1))
                             elif len(t_w) - text_i > 50:
                                 t_w_splited=t_w[text_i:len(t_w)]
-                                predict_list.append(predict(t_w_splited, id, word_index, model, sf,model_shape1))
+                                predict_list.append(predict(t_w_splited, id, word_index, model, model_shape1))
                     else:
-                        predict_list.append(predict(t_w, id, word_index, model, sf,model_shape1))
+                        predict_list.append(predict(t_w, id, word_index, model, model_shape1))
 
                     # ----------------------
                     max_predict=[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
                     for prediction in predict_list:
 
                         for j, p_i in enumerate(prediction):
-                            if j > 0 and p_i>max_predict[j-1]:
-                                max_predict[j-1]=p_i
-
-                    for m_p in max_predict:
-                        outputstr_m += "," + "%.2f" % m_p
+                            if p_i>max_predict[j]:
+                                max_predict[j]=p_i
+                    max_m_p=0
+                    max_k=0
+                    for k, m_p in enumerate(max_predict):
+                        if m_p>max_m_p:
+                            max_m_p=m_p
+                            max_k=k
+                    for kk in range(9):
+                        if kk==max_k:
+                            outputstr_m += "," + "1"
+                        else:
+                            outputstr_m += "," + "0"
 
                     print(outputstr_m)
                     sf.write(outputstr_m + '\n')
@@ -103,8 +129,7 @@ with open(filename, 'r', encoding="utf-8") as f:
                     for prediction in predict_list:
 
                         for j, p_i in enumerate(prediction):
-                            if j > 0:
-                                sum_predict[j - 1] += p_i
+                            sum_predict[j] += p_i
 
                     for m_p in sum_predict:
                         outputstr_a += "," + "%.2f" % (m_p/len(predict_list))

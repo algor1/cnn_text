@@ -17,7 +17,7 @@ GLOVE_DIR = "./glove.6B"
 SAVE_DIR= "./Save"+ str(int(d_now.timestamp()))
 if not os.path.exists(SAVE_DIR): os.mkdir(SAVE_DIR)
 
-MAX_NB_WORDS=180000 #словарь
+MAX_NB_WORDS=50000 #словарь
 MAX_NB_WORDS_IN_TEXT=5000 # Если больше то режем на куски
 EMBEDDING_DIM=300
 VALIDATION_SPLIT=0.05
@@ -180,7 +180,11 @@ model.compile(loss='categorical_crossentropy',
 
 embedding_matrix=None
 embeddings_index=None
-
+with open(os.path.join(SAVE_DIR, 'info.log'), 'a') as f:
+    f.write(str(datetime.datetime.now()))
+    f.write('datacount      ' + str(lendata) + '\n')
+    f.write('EMBEDDING_DIM  ' + str(EMBEDDING_DIM) + '\n')
+    f.write('dict           ' + str(MAX_NB_WORDS) + '\n')
 for epoch in range(NUM_EPOCHS):
     i=0
     for j in range(NUM_ROWS_SAVE_TO_TRAIN-NUM_ROWS_SAVE_TO_VAL, lendata, NUM_ROWS_SAVE_TO_TRAIN-NUM_ROWS_SAVE_TO_VAL ):
@@ -203,9 +207,9 @@ for epoch in range(NUM_EPOCHS):
     with open (os.path.join(SAVE_DIR, 'info.log'), 'a') as f:
         f.write (str(datetime.datetime.now()))
         f.write("Epoch          "+str( epoch)+'\n')
-        f.write('datacount      '+str(lendata)+'\n')
-        f.write('dict           '+str(MAX_NB_WORDS)+'\n')
-        f.write('EMBEDDING_DIM  '+str(EMBEDDING_DIM)+'\n')
+
+
+
 
 
 
