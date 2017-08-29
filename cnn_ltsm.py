@@ -19,7 +19,7 @@ if not os.path.exists(SAVE_DIR): os.mkdir(SAVE_DIR)
 
 MAX_NB_WORDS=180000 #словарь
 MAX_NB_WORDS_IN_TEXT=5000 # Если больше то режем на куски
-EMBEDDING_DIM=50
+EMBEDDING_DIM=100
 VALIDATION_SPLIT=0.05
 NUM_ROWS_FROM_TEXT=5000
 NUM_ROWS_SAVE_TO_TRAIN=1000
@@ -112,7 +112,7 @@ nb_validation_samples = int(VALIDATION_SPLIT * data.shape[0])
 
 
 embeddings_index = {}
-f = open(os.path.join(GLOVE_DIR, 'glove.6B.50d.txt'), encoding="utf-8")
+f = open(os.path.join(GLOVE_DIR, 'glove.6B.100d.txt'), encoding="utf-8")
 for line in f:
     values = line.split()
     word = values[0]
