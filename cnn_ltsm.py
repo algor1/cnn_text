@@ -160,9 +160,10 @@ embedding_layer = Embedding(len(word_index) + 1,
 
 sequence_input = Input(shape=(MAX_SEQUENCE_LENGTH,), dtype='int32')
 embedded_sequences = embedding_layer(sequence_input)
-x= Conv1D(filters=32, kernel_size=3, padding='same', activation='relu')(embedded_sequences)
-x= Conv1D(filters=128, kernel_size=15, padding='same', activation='relu')(x)
-x= MaxPooling1D(pool_size=5)(x)
+x=Dropout(0.5)(embedded_sequences)
+x= Conv1D(filters=128, kernel_size=3, padding='same', activation='relu')(x)
+x= MaxPooling1D(pool_size=2)(x)
+x = LSTM(100, dropout=0.2, recurrent_dropout=0.2,return_sequences=True)(x)
 x = LSTM(100, dropout=0.2, recurrent_dropout=0.2)(x)
 x = Dense(32, activation='relu')(x)
 preds = Dense(len(labels_index), activation='softmax')(x)
@@ -200,6 +201,5 @@ for epoch in range(NUM_EPOCHS):
         f.write('datacount      '+str(lendata)+'\n')
         f.write('dict           '+str(MAX_NB_WORDS)+'\n')
         f.write('EMBEDDING_DIM  '+str(EMBEDDING_DIM)+'\n')
-
 
 
